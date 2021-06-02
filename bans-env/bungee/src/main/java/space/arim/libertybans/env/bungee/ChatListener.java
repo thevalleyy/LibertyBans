@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import space.arim.api.chat.SendableMessage;
 import space.arim.api.env.PlatformHandle;
 
@@ -36,6 +38,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import space.arim.omnibus.util.ThisClass;
 
 @Singleton
 public class ChatListener extends ParallelisedListener<ChatEvent, SendableMessage> implements Listener {
@@ -44,6 +47,8 @@ public class ChatListener extends ParallelisedListener<ChatEvent, SendableMessag
 	private final Enforcer enforcer;
 	private final AddressReporter addressReporter;
 	private final PlatformHandle handle;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThisClass.get());
 	
 	@Inject
 	public ChatListener(Plugin plugin, Enforcer enforcer, AddressReporter addressReporter, PlatformHandle handle) {
@@ -67,6 +72,7 @@ public class ChatListener extends ParallelisedListener<ChatEvent, SendableMessag
 	public void onChatLow(ChatEvent event) {
 		Connection sender = event.getSender();
 		if (!(sender instanceof ProxiedPlayer)) {
+			LOGGER.info("Sender {} is not a player", sender);
 			return;
 		}
 		if (event.isCancelled()) {
@@ -92,10 +98,17 @@ public class ChatListener extends ParallelisedListener<ChatEvent, SendableMessag
 		SendableMessage message = withdraw(event);
 		if (message == null) {
 			debugResultPermitted(event);
+			LOGGER.info("Event {} is permitted", event);
 			return;
 		}
 		event.setCancelled(true);
 		handle.sendMessage(event.getSender(), message);
+		LOGGER.info("Cancelled event {} from {}", event, event.getSender());
+	}
+
+	@EventHandler(priority = Byte.MAX_VALUE)
+	public void onChatMax(ChatEvent event) {
+		LOGGER.info("Final event is {}", event);
 	}
 	
 }
