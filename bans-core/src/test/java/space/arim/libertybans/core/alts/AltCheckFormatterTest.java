@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,6 +78,7 @@ public class AltCheckFormatterTest {
 				"detection_kind: %DETECTION_KIND%, address: %ADDRESS%, username: %RELEVANT_USER%, " +
 						"user_id: %RELEVANT_USERID%, date_recorded: %DATE_RECORDED%")));
 		when(conf.normal()).thenReturn(Component.text("NORMAL"));
+		when(formatter.prefix(any())).thenAnswer((invocation) -> invocation.getArgument(0));
 		when(formatter.formatAbsoluteDate(date)).thenReturn(date.toString());
 		assertEquals("Alt report for MainUser\n" +
 						"detection_kind: " + alt.detectionKind() + ", address: " + address + ", username: " + username +
