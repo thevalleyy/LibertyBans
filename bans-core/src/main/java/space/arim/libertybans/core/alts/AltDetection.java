@@ -53,7 +53,7 @@ public class AltDetection {
 				"ON `names`.`uuid` = `detected_alt`.`uuid` AND `names`.`updated` = `detected_alt`.`updated` " +
 				"WHERE `addresses`.`uuid` = ? " +
 				"ORDER BY `updated` DESC")
-				.params(uuid, address, uuid)
+				.params(uuid)
 				.listResult((resultSet) -> {
 					NetworkAddress detectedAddress = NetworkAddress.of(resultSet.getBytes("address"));
 					// If this alt can be detected 'normally', then the address will be the same

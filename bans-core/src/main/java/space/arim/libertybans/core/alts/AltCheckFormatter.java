@@ -41,12 +41,8 @@ public class AltCheckFormatter {
 		this.formatter = formatter;
 	}
 
-	private AltsSection section() {
-		return configs.getMessagesConfig().alts();
-	}
-
 	private AltsSection.Formatting formatting() {
-		return section().formatting();
+		return configs.getMessagesConfig().alts().formatting();
 	}
 
 	private ComponentLike getKind(DetectionKind detectionKind) {
