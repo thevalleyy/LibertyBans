@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import space.arim.libertybans.api.NetworkAddress;
 import space.arim.libertybans.core.punish.Enforcer;
+import space.arim.libertybans.core.service.SettableTime;
 import space.arim.libertybans.core.uuid.UUIDManager;
 import space.arim.libertybans.it.InjectionInvocationContextProvider;
 import space.arim.libertybans.it.util.RandomUtil;
@@ -80,7 +81,7 @@ public class UUIDStoreIT {
 	}
 
 	@TestTemplate
-	public void useLatestName(Enforcer enforcer) {
+	public void useLatestName(Enforcer enforcer, SettableTime time) {
 		UUID uuid = UUID.randomUUID();
 		String name = randomName();
 		NetworkAddress address = randomAddress();
@@ -94,13 +95,8 @@ public class UUIDStoreIT {
 		String recentName = randomName();
 		NetworkAddress recentAddress = randomAddress();
 
-		/*
-		 * Without this delay, the test continues too quickly, causing it to fail spuriously.
-		 * This is because tracking of which name or address is more recent has only seconds precision.
-		 * 
-		 * In reality, it won't matter which address is chosen as more recent within the same second
-		 */
-		TestingUtil.sleepUnchecked(Duration.ofSeconds(1L));
+		// Advance to make the previous name and address outdated
+		time.advanceBy(Duration.ofSeconds(2L));
 
 		assumeTrue(null == enforcer.executeAndCheckConnection(uuid, recentName, recentAddress).join());
 

@@ -67,11 +67,11 @@ public class ApplicableImpl {
 		this.time = time;
 	}
 	
-	private Map.Entry<String, Object[]> getApplicabilityQuery(UUID uuid, NetworkAddress address, PunishmentType type) {
+	private Map.Entry<String, Object[]> getApplicabilityQuery(UUID uuid, NetworkAddress address,
+															  PunishmentType type, final long currentTime) {
 		String statement;
 		Object[] args;
 
-		long currentTime = MiscUtil.currentTime();
 		AddressStrictness strictness = configs.getMainConfig().enforcement().addressStrictness();
 		switch (strictness) {
 		case LENIENT:
@@ -104,8 +104,8 @@ public class ApplicableImpl {
 		InternalDatabase database = dbProvider.get();
 		return database.selectAsync(() -> {
 
-			Map.Entry<String, Object[]> query = getApplicabilityQuery(uuid, address, PunishmentType.BAN);
 			long currentTime = time.currentTime();
+			Map.Entry<String, Object[]> query = getApplicabilityQuery(uuid, address, PunishmentType.BAN, currentTime);
 
 			Object banOrDetectedAltsOrNull = database.jdbCaesar().transaction().body((querySource, controller) -> {
 
@@ -147,7 +147,7 @@ public class ApplicableImpl {
 		InternalDatabase database = dbProvider.get();
 		return database.selectAsync(() -> {
 
-			Map.Entry<String, Object[]> query = getApplicabilityQuery(uuid, address, type);
+			Map.Entry<String, Object[]> query = getApplicabilityQuery(uuid, address, type, time.currentTime());
 			return database.jdbCaesar().query(
 					query.getKey())
 					.params(query.getValue())

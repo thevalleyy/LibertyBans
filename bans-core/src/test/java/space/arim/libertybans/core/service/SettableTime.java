@@ -19,29 +19,17 @@
 
 package space.arim.libertybans.core.service;
 
-import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 
-/**
- * Timer which is very similar to {@link Clock}
- *
- */
-public interface Time {
+public interface SettableTime extends Time {
 
-	/**
-	 * Retrieves the current time in seconds
-	 *
-	 * @return the current time
-	 */
-	long currentTime();
+	void setTimestamp(Instant timestamp);
 
 	/**
-	 * Retrieves the current timestamp
+	 * Sets the time to a new time with the given progression applied
 	 *
-	 * @return the current timestamp
+	 * @param progression the progression
 	 */
-	default Instant currentTimestamp() {
-		return Instant.ofEpochSecond(currentTime());
-	}
-
+	void advanceBy(TemporalAmount progression);
 }
