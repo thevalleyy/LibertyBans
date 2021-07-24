@@ -21,7 +21,6 @@ package space.arim.libertybans.core;
 import jakarta.inject.Singleton;
 import space.arim.libertybans.core.config.Configs;
 import space.arim.libertybans.core.config.SpecifiedConfigs;
-import space.arim.libertybans.core.service.FixedTime;
 import space.arim.libertybans.core.service.SettableTime;
 import space.arim.libertybans.core.service.SettableTimeImpl;
 import space.arim.libertybans.core.service.Time;
@@ -35,7 +34,7 @@ public class PillarOneReplacementModule extends PillarOneBindModuleMinusConfigs 
 
 	@Singleton
 	public SettableTime time(ConfigSpec configSpec) {
-		return new SettableTimeImpl(new FixedTime(configSpec.unixTime()));
+		return new SettableTimeImpl(configSpec.unixTime());
 	}
 
 	public Time time(SettableTime time) {
