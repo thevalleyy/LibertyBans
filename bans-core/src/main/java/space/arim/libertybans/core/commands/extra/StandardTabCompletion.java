@@ -31,6 +31,7 @@ import space.arim.libertybans.core.service.Time;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Singleton
@@ -54,7 +55,7 @@ public final class StandardTabCompletion implements TabCompletion {
 		TabCompletionConfig config = configs.getMainConfig().commands().tabCompletion();
 		if (config.offlinePlayerNames()) {
 			Duration retention = Duration.ofHours(config.offlinePlayerNamesRetentionHours());
-			nameCache = Caffeine.newBuilder()
+			AsyncLoadingCache<Boolean, Set<String>> nameCache = Caffeine.newBuilder()
 					.refreshAfterWrite(Duration.ofMinutes(10L))
 					.buildAsync((key, executor) -> {
 						InternalDatabase database = dbProvider.get();
@@ -68,6 +69,9 @@ public final class StandardTabCompletion implements TabCompletion {
 									.execute());
 						});
 					});
+			// Load initial value
+			nameCache.get(Boolean.TRUE).join();
+			this.nameCache = nameCache;
 		} else {
 			nameCache = null;
 		}
@@ -88,10 +92,7 @@ public final class StandardTabCompletion implements TabCompletion {
 		if (nameCache == null) {
 			return sender.getPlayersOnSameServer();
 		}
-		return nameCache.get(Boolean.TRUE).getNow(Set.of()).stream();
+		return nameCache.get(Boolean.TRUE).orTimeout(1L, TimeUnit.MILLISECONDS).join().stream();
 	}
 
-	public void awaitCacheComputations() {
-		nameCache.get(Boolean.TRUE).join();
-	}
 }

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import space.arim.libertybans.core.commands.extra.StandardTabCompletion;
+import space.arim.libertybans.core.commands.extra.TabCompletion;
 import space.arim.libertybans.core.commands.extra.TabCompletionConfig;
 import space.arim.libertybans.core.config.Configs;
 import space.arim.libertybans.core.config.MainConfig;
@@ -55,7 +56,7 @@ public class OfflineNamesIT {
 	private final Provider<InternalDatabase> dbProvider;
 	private final Time time;
 
-	private StandardTabCompletion tabCompletion;
+	private TabCompletion tabCompletion;
 
 	@Inject
 	public OfflineNamesIT(@DontInject @Mock Configs configs, Provider<InternalDatabase> dbProvider, Time time) {
@@ -96,10 +97,8 @@ public class OfflineNamesIT {
 						UUID.randomUUID(), "Player3", now.minus(Duration.ofHours(5L)).getEpochSecond())
 				.voidResult().execute();
 
-		// Initiate and wait for caching before making assertions
 		tabCompletion.startup();
 		tabCompletion.completeOfflinePlayerNames(sender);
-		tabCompletion.awaitCacheComputations();
 
 		assertEquals(Set.of("Sender", "Player1", "Player2"),
 				tabCompletion.completeOfflinePlayerNames(sender).collect(Collectors.toUnmodifiableSet()));
