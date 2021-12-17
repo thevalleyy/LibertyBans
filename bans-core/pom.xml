@@ -97,7 +97,7 @@
 							<containerNamePattern>%a</containerNamePattern>
 							<images>
 								<image>
-									<name>mariadb:10.2</name>
+									<name>mariadb:10.3</name>
 									<alias>mariadb-legacy</alias>
 									<run>
 										<env>
